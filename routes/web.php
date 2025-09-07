@@ -1,0 +1,47 @@
+<?php
+
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\TicketController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::middleware(['guest:web','preventBackHistory'])->group(function () {
+    Route::get('/', [AuthController::class, 'index'])->name('login.index');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+});
+
+Route::middleware(['auth:web','preventBackHistory'])->prefix('auth')->name('auth.')->group(function () {
+    Route::get('/overview', [OverviewController::class, 'index'])->name('overview');
+    // Tickets
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/list', [TicketController::class, 'list'])->name('tickets.list');
+    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets/store', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+
+    // account
+    Route::get('/account/user', [AccountController::class, 'accountUser'])->name('account.user');
+    Route::get('/account/user/create', [AccountController::class, 'accountCreateUser'])->name('account.user.create');
+    Route::get('/account/user/{id}/edit', [AccountController::class, 'accountEditUser'])->name('account.user.edit');
+    Route::post('/account/user/store', [AccountController::class, 'accountUserStore'])->name('account.user.store');
+    Route::post('/account/user/update', [AccountController::class, 'accountUpdateUser'])->name('account.user.update');
+    Route::get('/account/user/list', [AccountController::class, 'accountUserList'])->name('account.user.list');
+    Route::get('/account/profile', [AccountController::class, 'accountProfile'])->name('account.profile');
+    Route::post('/account/user/update-role', [AccountController::class, 'accountUpdateRole'])->name('account.user.update-role');
+
+    Route::get('/logout', [AuthController::class, 'signOut'])->name('logout');
+});
+
+
