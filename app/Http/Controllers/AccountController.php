@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ticket;
+use App\Models\TicketReply;
 use App\Models\User;
+use App\Notifications\TicketUpdateNotification;
 use App\Services\DataTableService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
 {
@@ -15,6 +19,30 @@ class AccountController extends Controller
     {
         $this->dataTable = $dataTable;
     }
+
+   public function update(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . auth()->id(),
+            'username' => 'nullable|unique:users,username,' . auth()->id(),
+            'password' => 'nullable|min:8|confirmed', 
+        ]);
+
+        $user = auth()->user();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->username = $request->username;
+
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+ 
+
+        $user->save();
+
+        return back()->with('success', 'Profile updated successfully.');
+    }
+
 
     public function accountProfile() {
         return view('accounts.profile');
@@ -144,5 +172,52 @@ class AccountController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Role updated successfully']);
     }
+
+     public function userSearch(Request $request)
+     {
+       $q = $request->get('q');
+
+        $users = User::where('name', 'like', "%$q%")
+            ->select('id', 'name as text') // <-- 'text' is required by Select2
+            ->paginate(10);
+
+        return response()->json([
+            'results' => $users->items(),
+            'pagination' => [
+                'more' => $users->hasMorePages()
+            ]
+        ]);
+    }
+
+    public function userAssign(Request $request)
+    {
+        $request->validate([
+            'ticket_id' => 'required|exists:tickets,id',
+            'assigned_to' => 'required|exists:users,id',
+            'assigned_by' => 'required|exists:users,id',
+        ]);
+
+        $assignedTo = $request->input('assigned_to');
+        $assignedBy = $request->input('assigned_by');
+        $ticketId   = $request->input('ticket_id');
+
+        $ticket = \App\Models\Ticket::findOrFail($ticketId);
+        $ticket->assigned_to = $assignedTo;
+        $ticket->assigned_by = $assignedBy;
+        $ticket->save();
+
+        TicketReply::create([
+            'ticket_id'   => $ticket->id,
+            'user_id'     => $assignedBy,
+            'description' => 'Your support ticket has been successfully assigned. Rest assured, our team is reviewing it and will respond soon.',
+        ]); 
+
+        $user = User::findOrFail($assignedTo);
+        $user->notify(new TicketUpdateNotification($ticket, 'assigned', 'You have been assigned a ticket.'));
+
+        return response()->json(['success' => true, 'message' => 'Ticket assigned successfully']);
+
+    }
+  
 
 }

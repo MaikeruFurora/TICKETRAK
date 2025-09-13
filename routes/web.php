@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketReplyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['guest:web','preventBackHistory'])->group(function () {
     Route::get('/', [AuthController::class, 'index'])->name('login.index');
     Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+    Route::get('/forgot', [AuthController::class, 'forgot'])->name('forgot');
+    Route::post('/forgot/send', [AuthController::class, 'sendResetLink'])->name('forgot.sendResetLink');
 });
 
 Route::middleware(['auth:web','preventBackHistory'])->prefix('auth')->name('auth.')->group(function () {
@@ -29,7 +32,10 @@ Route::middleware(['auth:web','preventBackHistory'])->prefix('auth')->name('auth
     Route::get('/tickets/list', [TicketController::class, 'list'])->name('tickets.list');
     Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets/store', [TicketController::class, 'store'])->name('tickets.store');
-    Route::get('/tickets/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+    Route::get('/tickets/show/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/reply/{ticket}', [TicketReplyController::class, 'store'])->name('tickets.reply');
+    Route::get('/tickets/status/{ticket}', [TicketController::class, 'changeStatus'])->name('tickets.status');
+    Route::post('/tickets/upload-chunk', [TicketController::class, 'uploadChunk'])->name('tickets.upload.chunk');
 
     // account
     Route::get('/account/user', [AccountController::class, 'accountUser'])->name('account.user');
@@ -40,7 +46,9 @@ Route::middleware(['auth:web','preventBackHistory'])->prefix('auth')->name('auth
     Route::get('/account/user/list', [AccountController::class, 'accountUserList'])->name('account.user.list');
     Route::get('/account/profile', [AccountController::class, 'accountProfile'])->name('account.profile');
     Route::post('/account/user/update-role', [AccountController::class, 'accountUpdateRole'])->name('account.user.update-role');
+    Route::put('/profile/update', [AccountController::class, 'update'])->name('account.profile.update');
 
+   
     Route::get('/logout', [AuthController::class, 'signOut'])->name('logout');
 });
 

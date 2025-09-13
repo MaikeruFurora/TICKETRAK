@@ -1,0 +1,30 @@
+ body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #F2FAFB;
+      }
+      .info-panel {
+        background: linear-gradient(135deg, #002E5D, #447795);
+        color: #fff;
+        min-height: 100vh;
+      }
+    
+     .info-panel {
+        background: linear-gradient(135deg, #204b6f, #85b9dc); /* lighter blue gradient */
+        color: #fff;
+        min-height: 100vh;      
+        display: flex;          
+        justify-content: flex-start;
+        align-items: center;    
+        text-align: left;
+      }
+
+       /* Hover effect for button */
+      .btn:hover {
+        background-color: #447795 !important;
+      }
+
+      /* Focus effect for inputs */
+      .form-control:focus {
+        border-color: #447795;
+        box-shadow: 0 0 0 0.2rem rgba(68, 119, 149, 0.25);
+      }

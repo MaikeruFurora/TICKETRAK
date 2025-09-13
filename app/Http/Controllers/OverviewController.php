@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 class OverviewController extends Controller
 {
     public function index(){
-        return view('overview.index');
+        $total_tickets = auth()->user()->tickets()->count();
+        $tickets = auth()->user()->tickets()->count();
+        $tickets = auth()->user()->tickets()->count();
+        
+        return view('overview.index',compact('tickets'));
     }
 
     

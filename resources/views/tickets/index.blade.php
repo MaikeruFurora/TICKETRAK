@@ -1,4 +1,5 @@
 @extends('layout.app')
+ 
 @section('content')
     <div class="page-header">
     <div class="row align-items-center">
@@ -33,62 +34,106 @@
         </div>
     </div>
     </div>
-    <div class="card card-md mt-3">
-    <div class="card-body">
-        <table class="table table-responsive table-hover table-bordered align-middle" id="example">
-        <thead>
-            <tr>
-            <th>#</th>
-            <th class="text-nowrap">Ticket No</th>
-            <th class="text-nowrap">Subject</th>
-            <th class="text-nowrap">Created at</th>
-            <th class="text-nowrap">Description</th>
-            <th class="text-nowrap">Status</th>
-            <th class="text-nowrap">Action</th> 
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            <th>1</th>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td> 
-            </tr>
-            <tr>
-            <th>2</th>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            <td>Cell</td>
-            </tr>
-        </tbody>
-        </table>
+    
+   {{-- Only show on medium and larger screens --}}
+    <div class="d-none d-md-block">
+        @if (in_array(auth()->user()->role, $role_code))
+            @include('tickets.partials.admin-stats', ['ticket' => $ticket])
+        @endif
     </div>
+ 
+    <div class="card shadow-sm mt-3 border-0">
+        <div class="card-body p-4">
+
+            @php
+                $today = now()->format('Y-m-d');
+                $lastMonth = now()->subMonth()->format('Y-m-d');
+            @endphp
+    
+
+            {{-- Filters --}}
+           <div class="row">
+                <div class="col-xl-8 col-lg-8 col-12">
+                    <div class="row g-3 mb-4 align-items-end">
+                        <!-- Status -->
+                        <div class="col-12 col-sm-4 col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 12px">Status</label>
+                            <select id="statusFilter" class="form-select form-select-sm">
+                                <option value="">All</option>
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+
+                        <!-- From Date -->
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 12px">From</label>
+                            <input type="date" id="fromDate" class="form-control form-control-sm" value="{{ $lastMonth }}">
+                        </div>
+
+                        <!-- To Date -->
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 12px">To</label>
+                            <input type="date" id="toDate" class="form-control form-control-sm" value="{{ $today }}">
+                        </div>
+
+                        <!-- Filter Button -->
+                        <div class="col-12 col-sm-4 col-md-2">
+                            <button id="filterBtn" class="btn btn-primary w-100 btn-sm">Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            
+            {{-- Tickets Table --}}
+            {{-- <div class="table-responsive"> --}}
+                <table class="table table-bordered table-responsive table-sm table-hover align-middle" 
+                    id="ticketsTable"
+                    data-table-url="{{ route('auth.tickets.list') }}">
+                    <thead class="table-light">
+                        <tr>
+                            <th></th>
+                            <th class="text-nowrap">Ticket #</th>
+                            <th>Subject</th>
+                            <th>Description</th>
+                            <th class="text-nowrap">Created</th>
+                            <th>Status</th>
+                            <th class="text-nowrap">Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            {{-- </div> --}}
+        </div>
     </div>
+
 @endsection
 @section('scripts')
-    <script>
-        $(function () {
-            $('#example').DataTable({
-                "responsive": true,
-                "autoWidth": false,
-                "dom":"<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +"<'row'<'col-sm-12'tr>>" +"<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
-            });
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-        });
-    </script>
-@endsection
+    <script src="{{ asset('dist/scripts/tickets.index.js') }}?v={{ time() }}"></script>
+    <!-- Include CountUp.js UMD -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.6.2/countUp.umd.js"></script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Loop through all elements with data-count
+    document.querySelectorAll('[data-count]').forEach(function(el) {
+        const endVal = parseFloat(el.getAttribute('data-count')) || 0;
+
+        // Create CountUp instance
+        const countUp = new window.CountUp(el, endVal, {
+            duration: 2,
+            decimalPlaces: 0
+        });
+
+        // Start animation
+        if (!countUp.error) {
+            countUp.start();
+        } else {
+            console.error(countUp.error);
+        }
+    });
+});
+</script>
+
+@endsection

@@ -16,6 +16,8 @@ class CreateTicketAttachmentsTable extends Migration
         Schema::create('ticket_attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('ticket_reply_id')->nullable();
+            $table->foreign('ticket_reply_id')->references('id')->on('ticket_replies')->onDelete('cascade');
             $table->string('file_path');
             $table->string('file_name');
             $table->timestamps();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::get('/account/user/search', [AccountController::class, 'userSearch']);
+Route::post('/account/assign/ticket', [AccountController::class, 'userAssign']);

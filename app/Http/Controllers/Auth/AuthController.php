@@ -5,12 +5,41 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function index()
     {
-        return view('login.index');
+        return view('auth.index');
+    }
+
+    public function forgot()
+    {
+        return view('auth.forgot');
+    }
+
+      public function sendResetLink(Request $request){
+        // Validate email
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // Send reset link
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return back()->with('message', 'Password reset link has been sent to your email.');
+        } else {
+            return back()->with('message', 'Unable to send reset link. Please try again later.');
+        }
     }
 
     public function login(Request $request)
@@ -52,7 +81,7 @@ class AuthController extends Controller
 
         if (Auth::guard('web')->attempt($credentials,$remember)) { 
 
-            return redirect()->route('auth.overview');
+            return redirect()->route('auth.tickets.index');
 
         }else{
             

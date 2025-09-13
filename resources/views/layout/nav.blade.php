@@ -1,53 +1,84 @@
-<!-- Offcanvas toggler in the top nav -->
-<nav class="navbar navbar-light bg-white shadow-sm">
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
   <div class="container">
-    <a class="navbar-brand" href="#">TicketRak</a>
+    
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold text-primary" href="#">
+      {{  config('app.name', 'TaskTicket') }}
+    </a>
 
-    <!-- show offcanvas toggler on small screens -->
-    <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu"
-      aria-controls="mobileMenu">
+    <!-- Mobile Offcanvas Toggler -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu"
+      aria-controls="mobileMenu" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- normal desktop items -->
-    <div class="d-none d-lg-flex align-items-center ms-auto">
-      <a class="nav-link px-3" href="#">Dashboard</a>
-      <a class="nav-link px-3" href="{{  route('auth.tickets.index') }}">Tickets</a>
-      <a class="nav-link px-3" href="{{  route('auth.account.profile') }}">Profile</a>
-      <!-- user dropdown -->
-      <div class="dropdown mx-3">
-        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Account</a>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="{{  route('auth.account.user') }}">Account User</a></li>
-          
-        </ul>
-      </div>
-      <!-- user dropdown -->
-      <div class="dropdown">
-        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">{{  explode(' ', auth()->user()->name)[0] }}</a>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="{{  route('auth.account.profile') }}">Profile</a></li>
-          <li><a class="dropdown-item text-danger" href="{{ route('auth.logout') }}">Sign out</a></li>
-        </ul>
-      </div>
+    <!-- Desktop Menu -->
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav align-items-center">
+        <li class="nav-item">
+          <a class="nav-link px-3 {{ request()->routeIs('auth.tickets.*') ? 'active fw-bold text-primary' : '' }}" href="{{ route('auth.tickets.index') }}">
+            <!-- Ticket SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list-details me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M3 5h18" />
+              <path d="M3 12h18" />
+              <path d="M3 19h18" />
+            </svg>
+            Tickets
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-3 {{ request()->routeIs('auth.account.profile') ? 'active fw-bold text-primary' : '' }}" href="{{ route('auth.account.profile') }}">
+            <!-- Profile SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <circle cx="12" cy="7" r="4" />
+              <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+            </svg>
+            Profile
+          </a>
+        </li>
+
+        <!-- User Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle px-3" href="#" data-bs-toggle="dropdown">
+            <!-- User Circle SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-circle me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <circle cx="12" cy="12" r="9" />
+              <circle cx="12" cy="10" r="3" />
+              <path d="M6.168 18.849a6 6 0 0 1 11.664 0" />
+            </svg>
+            {{ auth()->user()->name }}
+          </a>
+          @if (auth()->user()->role=='administrator')
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><a class="dropdown-item" href="{{ route('auth.account.user') }}">
+                <!-- Settings SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06 .06a2 2 0 1 1 -2.83 2.83l-.06 -.06a1.65 1.65 0 0 0 -1.82 -.33 1.65 1.65 0 0 0 -1 1.51v.18a2 2 0 1 1 -4 0v-.18a1.65 1.65 0 0 0 -1 -1.51 1.65 1.65 0 0 0 -1.82 .33l-.06 .06a2 2 0 1 1 -2.83 -2.83l.06 -.06a1.65 1.65 0 0 0 .33 -1.82 1.65 1.65 0 0 0 -1.51 -1h-.18a2 2 0 1 1 0 -4h.18a1.65 1.65 0 0 0 1.51 -1 1.65 1.65 0 0 0 -.33 -1.82l-.06 -.06a2 2 0 1 1 2.83 -2.83l.06 .06a1.65 1.65 0 0 0 1.82 .33h.18a1.65 1.65 0 0 0 1 -1.51v-.18a2 2 0 1 1 4 0v.18a1.65 1.65 0 0 0 1 1.51h.18a1.65 1.65 0 0 0 1.82 -.33l.06 -.06a2 2 0 1 1 2.83 2.83l-.06 .06a1.65 1.65 0 0 0 -.33 1.82v.18a1.65 1.65 0 0 0 1.51 1h.18a2 2 0 1 1 0 4h-.18a1.65 1.65 0 0 0 -1.51 1z" />
+                </svg>
+                Account Settings
+              </a></li>
+            </ul>
+          @endif
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link px-3 text-danger" href="{{ route('auth.logout') }}">
+            <!-- Logout SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-logout me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
+              <path d="M7 12h14l-3 -3m0 6l3 -3" />
+            </svg>
+            Sign out
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
-
-<!-- Offcanvas panel -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <ul class="nav flex-column">
-      <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
-      <li><hr></li>
-      <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
-      <li class="nav-item"><a class="nav-link text-danger" href="{{ route('auth.logout') }}">Sign out</a></li>
-    </ul>
-  </div>
-</div>

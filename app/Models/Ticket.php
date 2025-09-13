@@ -10,4 +10,26 @@ class Ticket extends Model
     use HasFactory;
 
     protected $guarded=[];
+
+    public function attachments()
+    {
+        return $this->hasMany(TicketAttachment::class)
+                    ->whereNull('ticket_reply_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(TicketReply::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+    
 }

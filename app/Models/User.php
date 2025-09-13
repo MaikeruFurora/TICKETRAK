@@ -62,4 +62,27 @@ class User extends Authenticatable
             'description' => 'Third Party User',
         ],
     ];
+
+
+    public const ROLES_ONE = [
+        [
+            'code' => 'administrator',
+            'description' => 'Administrator',
+        ], 
+        [    
+            'code' => 'ticket_manager',
+            'description' => 'Ticket Manager',
+        ], 
+    ];
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+ 
+    public function assignedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'assigned_to');
+    }
+ 
 }

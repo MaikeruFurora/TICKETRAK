@@ -19,7 +19,7 @@ class CreateTicketsTable extends Migration
             $table->string('code')->unique();
             $table->string('subject');
             $table->text('description');
-            $table->string('status')->nullable();
+            $table->string('status')->enum(['Open','Closed'])->default('Open');
             $table->string('priority')->nullable();
             $table->string('assigned_to')->nullable();
             $table->string('assigned_by')->nullable();

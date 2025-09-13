@@ -89,7 +89,7 @@ class DataTableService
                         $value = $value->toDateString(); // Y-m-d
                     } else {
                         // Full datetime
-                        $value = $value->format('Y-m-d h:i:s');
+                        $value = $value->format('Y-m-d');
                     }
                 }
 
