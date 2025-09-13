@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use App\Models\TicketAttachment;
+use App\Models\TicketHistory;
 use App\Models\TicketReply;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -64,11 +65,12 @@ class TicketController extends Controller
             'created_at',
         ];
 
-       if (auth()->user()->role === 'administrator') {
-            $query = Ticket::with('attachments');
+        if (auth()->user()->role === 'administrator') {
+            $query = Ticket::with(['attachments', 'latestClosedHistory']);
         } else {
-            $query = auth()->user()->tickets()->getQuery()->with('attachments');
+            $query = auth()->user()->tickets()->getQuery()->with(['attachments', 'latestClosedHistory']);
         }
+
  
         // ✅ Apply filters
         if ($request->filled('status')) {
@@ -83,6 +85,9 @@ class TicketController extends Controller
         }
 
         $data = $this->dataTable->handle($request, $query, $columns, [
+            'status' => function ($ticket) {
+                return $ticket->status === 'Open' ? '<span class="badge text-white bg-warning">Open</span>' : '<span class="badge text-white bg-success">Closed</span>';
+            },
             'attachment_count' => function ($ticket) {
                 return $ticket->attachments->count() > 1
                     ? $ticket->attachments->count().' file(s)'
@@ -101,6 +106,19 @@ class TicketController extends Controller
                     50,
                     ' <a href="/auth/tickets/show/'.$ticket->id.'" style="font-size: 10px;">more</a>'
                 );
+            },
+           'created_by' => function ($ticket) {
+                return $ticket->user->name;
+            },
+            'closed_at' => function ($ticket) {
+                return $ticket->latestClosedHistory
+                    ? $ticket->latestClosedHistory->created_at->format('Y-m-d')
+                    : '-';
+            },
+            'closed_by' => function ($ticket) {
+                return $ticket->latestClosedHistory && $ticket->latestClosedHistory->user
+                    ? $ticket->latestClosedHistory->user->name
+                    : '-';
             },
             'action' => function ($ticket) {
                 return '<a href="/auth/tickets/show/'.$ticket->id.'" class="btn btn-sm btn-primary w-100">View</a>';
@@ -152,7 +170,7 @@ class TicketController extends Controller
                     'description' => $validated['description'],
                 ]);
 
-            if ($request->hasFile('attachments')) {
+                if ($request->hasFile('attachments')) {
                     foreach ($request->file('attachments') as $file) {
                         // Store file in "storage/app/public/attachments"
                         $path = $file->store('attachments', 'public');
@@ -164,9 +182,17 @@ class TicketController extends Controller
                         ]);
                     }
                 }
+
+                TicketHistory::create([
+                    'ticket_id' => $ticket->id,
+                    'user_id'   => $ticket->user_id,
+                    'type'      => 'created',
+                    'old_value' => null,  // probably 'Closed'
+                    'new_value' => 'Open',
+                ]);
                 
             });
-        
+            
             return redirect()->route('auth.tickets.create')->with('message', 'Ticket created successfully ');
 
     }
@@ -179,9 +205,10 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
+        $priorities  =  Ticket::PRORITIES; 
         $ticket->load('attachments', 'replies', 'replies.attachments', 'replies.user','assignedUser');
         $role_code = array_column(User::ROLES_ONE, 'code');
-        return view('tickets.show', compact('ticket','role_code'));
+        return view('tickets.show', compact('ticket','role_code','priorities'));
     }
 
     /**
@@ -220,26 +247,52 @@ class TicketController extends Controller
 
     public function changeStatus(Request $request, Ticket $ticket)
     {
-        DB::transaction(function () use ($ticket, $request) {
+       DB::transaction(function () use ($ticket, $request) {
+
+            $oldStatus = $ticket->status; // store old status
+
             // Toggle ticket status
             $ticket->status = $ticket->status === 'Open' ? 'Closed' : 'Open';
             $ticket->save();
 
-            // Create a static message for closed tickets
             if ($ticket->status === 'Closed') {
+
+               $description = $ticket->user_id === auth()->id()
+                    ? 'You closed your ticket'
+                    : 'Your support ticket has been successfully resolved and closed. Thank you for reaching out, and feel free to contact us if you need further assistance.';
+
+
                 TicketReply::create([
                     'ticket_id'   => $ticket->id,
-                    'user_id'     => auth()->id(), // or the user who performed the action
-                    'description' => 'Your support ticket has been successfully resolved and closed. Thank you for reaching out, and feel free to contact us if you need further assistance.',
+                    'user_id'     => auth()->id(),
+                    'description' => $description
                 ]);
-            } else {
+
+                TicketHistory::create([
+                    'ticket_id' => $ticket->id,
+                    'user_id'   => auth()->id(),
+                    'type'      => 'status',
+                    'old_value' => $oldStatus,
+                    'new_value' => 'Closed',
+                ]);
+
+            } else { // reopened
                 TicketReply::create([
                     'ticket_id'   => $ticket->id,
                     'user_id'     => auth()->id(),
                     'description' => 'Your support ticket has been reopened. Our team will review it and respond as soon as possible.',
                 ]);
+
+                TicketHistory::create([
+                    'ticket_id' => $ticket->id,
+                    'user_id'   => auth()->id(),
+                    'type'      => 'status',
+                    'old_value' => $oldStatus,
+                    'new_value' => 'Reopened',
+                ]);
             }
         });
+
 
         return redirect()
             ->route('auth.tickets.show', ['ticket' => $ticket->id])
@@ -264,5 +317,27 @@ class TicketController extends Controller
     }
 
       
+    public function updatePriorityStatus(Request $request){
+
+        $validated = $request->validate([
+            'priority' => 'required|string|max:20',
+            'ticket_id' => 'required|exists:tickets,id',
+        ]);
+
+        $ticket = Ticket::findOrFail($validated['ticket_id']);
+        $old_priority = $ticket->priority;
+        $ticket->priority = $validated['priority'];
+        $ticket->save();
+
+        TicketHistory::create([
+            'ticket_id' => $ticket->id,
+            'user_id'   => auth()->id(),
+            'type'      => 'priority',
+            'old_value' => $old_priority,
+            'new_value' => $validated['priority'],
+        ]);
+
+        return response()->json(['success' => true,'message' => 'Priority successfully changed to '.$validated['priority']]);
+    }
 
 }

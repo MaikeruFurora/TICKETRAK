@@ -10,6 +10,10 @@ $(function () {
         columnDefs: [
             { className: 'dtr-control', orderable: false, targets: 0 }
         ],
+         dom:
+        "<'row mb-2'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +
+        "<'row'<'col-12'tr>>" +
+        "<'row mt-2'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
         ajax: {
             url: tableURL,
             data: function (d) {
@@ -22,9 +26,10 @@ $(function () {
             { data: null, defaultContent: '' },
             { data: "code", name: "code" },
             { data: "subject", name: "subject" },
-            { data: "description", name: "description" },
+            { data: "created_by", name: "created_by", orderable: false },
             { data: "created_at", name: "created_at" },
-            { data: "status", name: "status" },
+            { data: "closed_at", name: "closed_at" },
+            { data: "closed_by", name: "closed_by" },
             { data: "action", name: "action", orderable: false, searchable: false }
         ]
     });

@@ -1,52 +1,77 @@
- const form = document.getElementById("ticketForm");
-    const dropzone = document.getElementById("dropzone");
-    const fileInput = document.getElementById("fileInput");
-    const fileCount = document.getElementById("fileCount");
-    const fileList = document.getElementById("fileList");
-    const clearBtn = document.getElementById("clearFiles");
+const form = document.getElementById("ticketForm");
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("fileInput");
+const fileCount = document.getElementById("fileCount");
+const fileList = document.getElementById("fileList");
+const clearBtn = document.getElementById("clearFiles");
 
-    // Open file picker when clicking dropzone
-    dropzone.addEventListener("click", () => fileInput.click());
+const submitBtn = document.getElementById("submitBtn");   // <-- make sure you add this id in HTML
+const submitText = document.getElementById("submitText"); // <-- wrap button text in a span with this id
 
-    // Handle file selection
-    fileInput.addEventListener("change", () => {
-        const files = fileInput.files;
-        fileList.innerHTML = "";
+let files = []; // store selected files
 
-        if (files.length > 0) {
-            fileCount.textContent = `${files.length} file(s) selected`;
+// Open file picker when clicking dropzone
+dropzone.addEventListener("click", () => fileInput.click());
 
-            // Show first 3 files
-            Array.from(files).slice(0, 3).forEach((file) => {
-                const li = document.createElement("li");
-                li.textContent = file.name;
-                fileList.appendChild(li);
-            });
+// Handle drag & drop
+dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropzone.classList.add("dragover");
+});
+dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+dropzone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropzone.classList.remove("dragover");
+  handleFiles(e.dataTransfer.files);
+});
 
-            // If more than 4 files, show summary
-            if (files.length > 4) {
-                const li = document.createElement("li");
-                li.textContent = `+${files.length - 3} attachment(s)`;
-                fileList.appendChild(li);
-            }
+// Handle manual selection
+fileInput.addEventListener("change", () => handleFiles(fileInput.files));
 
-            clearBtn.classList.remove("d-none"); // show clear button
-        } else {
-            fileCount.textContent = "";
-            clearBtn.classList.add("d-none"); // hide clear button
-        }
+// Add files to our array and render list
+function handleFiles(selectedFiles) {
+  files = [...files, ...selectedFiles];
+  renderFileList();
+}
+
+// Render file list
+function renderFileList() {
+  fileList.innerHTML = "";
+
+  if (files.length > 0) {
+    fileCount.textContent = `${files.length} file(s) selected`;
+
+    // Show first 3
+    files.slice(0, 3).forEach((file) => {
+      const li = document.createElement("li");
+      li.textContent = file.name;
+      fileList.appendChild(li);
     });
 
-    // Clear files
-    clearBtn.addEventListener("click", () => {
-        fileInput.value = ""; // reset file input
-        fileCount.textContent = "";
-        fileList.innerHTML = "";
-        clearBtn.classList.add("d-none"); // hide button again
-    });
+    // If more than 4, show summary
+    if (files.length > 4) {
+      const li = document.createElement("li");
+      li.textContent = `+${files.length - 3} attachment(s)`;
+      fileList.appendChild(li);
+    }
 
-    form.addEventListener("submit", function () {
-        submitBtn.disabled = true;
-        submitText.textContent = "Submitting...";
-        submitBtn.classList.add("disabled");
-    });
+    clearBtn.classList.remove("d-none");
+  } else {
+    fileCount.textContent = "";
+    clearBtn.classList.add("d-none");
+  }
+}
+
+// Clear files
+clearBtn.addEventListener("click", () => {
+  files = [];
+  fileInput.value = ""; // reset input
+  renderFileList();
+});
+
+// Disable submit button on submit
+form.addEventListener("submit", function () {
+  submitBtn.disabled = true;
+  submitText.textContent = "Submitting...";
+  submitBtn.classList.add("disabled");
+});

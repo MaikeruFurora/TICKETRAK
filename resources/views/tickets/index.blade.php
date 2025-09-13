@@ -52,7 +52,7 @@
     
 
             {{-- Filters --}}
-           <div class="row">
+           <div class="row mb-3">
                 <div class="col-xl-8 col-lg-8 col-12">
                     <div class="row g-3 mb-4 align-items-end">
                         <!-- Status -->
@@ -84,22 +84,21 @@
                     </div>
                 </div>
             </div>
-
-
-            
+ 
             {{-- Tickets Table --}}
             {{-- <div class="table-responsive"> --}}
-                <table class="table table-bordered table-responsive table-sm table-hover align-middle" 
+                <table class="table table-bordered table-responsive table-sm table-hover align-middle w-10" 
                     id="ticketsTable"
                     data-table-url="{{ route('auth.tickets.list') }}">
                     <thead class="table-light">
                         <tr>
                             <th></th>
                             <th class="text-nowrap">Ticket #</th>
-                            <th>Subject</th>
-                            <th>Description</th>
-                            <th class="text-nowrap">Created</th>
-                            <th>Status</th>
+                            <th>Subject</th> 
+                            <th>Created By</th> 
+                            <th class="text-nowrap">Created At</th>
+                            <th>Closed At</th>
+                            <th>Closed By</th>
                             <th class="text-nowrap">Action</th>
                         </tr>
                     </thead>

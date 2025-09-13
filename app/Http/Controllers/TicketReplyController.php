@@ -39,16 +39,25 @@ class TicketReplyController extends Controller
    public function store(Request $request, Ticket $ticket)
    {
         $validated = $request->validate([
-            'description' => 'required|string|max:1000',
-            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048',
+            'description'   => 'nullable|string|max:1000|required_without:attachments',
+            'attachments'   => 'nullable|required_without:description',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048',
+        ], [
+            'description.required_without' => 'Please enter a description or upload at least one attachment.',
+            'attachments.required_without' => 'Please upload a file or provide a description.',
         ]);
 
+        $description = $validated['description'] ?? null;
+
+        if (!$description && $request->hasFile('attachments')) {
+            $description = 'File(s) attached';
+        }
         
-        DB::transaction(function () use ($request, $ticket, $validated) {
+        DB::transaction(function () use ($request, $ticket, $validated, $description) {
              $reply = TicketReply::create([
                  'ticket_id' => $ticket->id,
                  'user_id' => auth()->user()->id,
-                 'description' => $validated['description'],
+                 'description' => $description,
              ]); 
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {

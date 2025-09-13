@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketHistoryController;
 use App\Http\Controllers\TicketReplyController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,10 @@ Route::middleware(['auth:web','preventBackHistory'])->prefix('auth')->name('auth
     Route::post('/tickets/reply/{ticket}', [TicketReplyController::class, 'store'])->name('tickets.reply');
     Route::get('/tickets/status/{ticket}', [TicketController::class, 'changeStatus'])->name('tickets.status');
     Route::post('/tickets/upload-chunk', [TicketController::class, 'uploadChunk'])->name('tickets.upload.chunk');
+    
+    //history
+    Route::get('/tickets/history/{ticket}', [TicketHistoryController::class, 'show'])->name('tickets.history.show');
+
 
     // account
     Route::get('/account/user', [AccountController::class, 'accountUser'])->name('account.user');

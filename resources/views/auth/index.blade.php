@@ -31,7 +31,7 @@
             <ul class="list-unstyled mt-4 fs-9">
               <li>✔ Submit tickets in seconds</li>
               <li>✔ Track updates in real-time</li>
-              <li>✔ Fast resolution guaranteed</li>
+              <li>✔ Support Without Boundaries</li>
             </ul>
         </div>
           <!-- Footer / Year Info -->
@@ -48,8 +48,8 @@
                 
                 <!-- Gradient Heading -->
                 <h2 class="card-title text-center mt-2 fw-bold"
-                    style="background: linear-gradient(90deg, #447795, #002E5D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem;">
-                  Welcome Back
+                    style="background: linear-gradient(90deg, #447795, #002E5D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.3rem;">
+                  Sign in to Continue
                 </h2>
                 
                 <!-- Subtext -->

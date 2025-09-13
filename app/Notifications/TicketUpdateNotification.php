@@ -8,9 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TicketUpdateNotification extends Notification
+class TicketUpdateNotification extends Notification implements ShouldQueue
 {
-    // use Queueable;
+    use Queueable;
     
     protected $ticket;
     protected $type;

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\TicketHistory;
 use App\Models\TicketReply;
 use App\Models\User;
 use App\Notifications\TicketUpdateNotification;
 use App\Services\DataTableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -190,9 +192,10 @@ class AccountController extends Controller
     }
 
     public function userAssign(Request $request)
-    {
+    { 
+
         $request->validate([
-            'ticket_id' => 'required|exists:tickets,id',
+            'ticket_id'   => 'required|exists:tickets,id',
             'assigned_to' => 'required|exists:users,id',
             'assigned_by' => 'required|exists:users,id',
         ]);
@@ -201,21 +204,53 @@ class AccountController extends Controller
         $assignedBy = $request->input('assigned_by');
         $ticketId   = $request->input('ticket_id');
 
-        $ticket = \App\Models\Ticket::findOrFail($ticketId);
-        $ticket->assigned_to = $assignedTo;
-        $ticket->assigned_by = $assignedBy;
-        $ticket->save();
+        // Eager load assignedUser to avoid extra query
+        $ticket = Ticket::with('assignedUser')->findOrFail($ticketId);
 
-        TicketReply::create([
-            'ticket_id'   => $ticket->id,
-            'user_id'     => $assignedBy,
-            'description' => 'Your support ticket has been successfully assigned. Rest assured, our team is reviewing it and will respond soon.',
-        ]); 
+        $old_assigned = $ticket->assignedUser?->name;
 
-        $user = User::findOrFail($assignedTo);
-        $user->notify(new TicketUpdateNotification($ticket, 'assigned', 'You have been assigned a ticket.'));
+        DB::transaction(function () use ($ticket, $assignedTo, $assignedBy, $old_assigned) {
 
-        return response()->json(['success' => true, 'message' => 'Ticket assigned successfully']);
+            // Update ticket assignment
+            $ticket->assigned_to = $assignedTo;
+            $ticket->assigned_by = $assignedBy;
+            $ticket->save();
+
+            // Create ticket reply
+            TicketReply::create([
+                'ticket_id'   => $ticket->id,
+                'user_id'     => $assignedBy,
+                'description' => 'Your support ticket has been successfully assigned. Rest assured, our team is reviewing it and will respond soon.',
+            ]);
+
+            // Fetch assigned user
+            $user = User::findOrFail($assignedTo);
+
+            // Create ticket history
+            TicketHistory::create([
+                'ticket_id' => $ticket->id,
+                'user_id'   => $assignedBy,
+                'type'      => 'assigned',
+                'old_value' => $old_assigned,
+                'new_value' => $user->name,
+            ]);
+
+            // Send notification (queued for speed)
+            $user->notify(new TicketUpdateNotification($ticket, 'assigned', 'You have been assigned a ticket.'));
+        });
+
+        // Return response
+        $user = User::findOrFail($assignedTo); // in case we need to return info outside transaction
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ticket assigned successfully',
+            'assigned_user' => [
+                'id'   => $user->id,
+                'name' => $user->name,
+            ],
+        ]);
+
 
     }
   

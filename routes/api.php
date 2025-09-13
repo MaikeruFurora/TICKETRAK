@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,3 +23,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/account/user/search', [AccountController::class, 'userSearch']);
 Route::post('/account/assign/ticket', [AccountController::class, 'userAssign']);
+Route::post('/tickets/assign/priority-status', [TicketController::class, 'updatePriorityStatus']);
