@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TicketNotification;
 use App\Models\Ticket;
 use App\Models\TicketReply;
 use App\Models\TicketAttachment;
+use App\Models\User;
+use App\Notifications\TicketUpdateNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class TicketReplyController extends Controller
 {
@@ -69,6 +73,45 @@ class TicketReplyController extends Controller
                     ]);
                 }
             }
+
+            // Decide who to notify
+            if ($reply->user_id === $ticket->user_id) {
+                // User replied → notify assigned agent/manager
+                $notifiables = User::where('role', 'ticket_manager')->get();   // models
+                $emails = $notifiables->pluck('email')->toArray();             // email array
+            } else {
+                // Agent/manager replied → notify ticket owner
+                $notifiables = User::where('id', $ticket->user_id)->get();
+                $emails = $notifiables->pluck('email')->toArray();
+            }
+
+            // Send notifications after the transaction is committed
+            DB::afterCommit(function () use ($notifiables, $emails, $ticket, $reply) {
+                $message = "There’s a new reply on support ticket (#{$ticket->code}).<br><br> <strong>Reply:</strong> "
+                        . nl2br(e($reply->description));
+
+                // Laravel notifications
+                // foreach ($notifiables as $user) {
+                //     $user->notify(new TicketUpdateNotification(
+                //         'Ticket Reply ' . $ticket->code,
+                //         $message, 
+                //         route('auth.tickets.show', $ticket->id),
+                //         'View Ticket',
+                //         $ticket
+                //     ));
+                // }
+
+                // Optional Mailable
+                Mail::to($emails)->queue(new TicketNotification(
+                    'Ticket Reply ' . $ticket->code,
+                    $message,
+                    route('auth.tickets.show', $ticket->id),
+                    'View Ticket',
+                    $ticket
+                ));
+            });
+
+
         });
 
         return redirect()->route('auth.tickets.show', $ticket->id)

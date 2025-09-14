@@ -19,7 +19,7 @@ class TicketHistoryController extends Controller
     ];
 
     // Start event
-    if ($ticket->status === 'open') {
+    if ($ticket->status == 'open') {
         $events[] = [
             'date' => 'Opened',
             'content' => "Ticket opened <small>{$ticket->created_at->format('M d, Y h:i A')}</small>"
@@ -43,6 +43,14 @@ class TicketHistoryController extends Controller
                 'content' => "Assigned to {$history->new_value} <small>by {$history->user?->name} on {$history->created_at->format('M d, Y h:i A')}</small>"
             ];
         }
+    }
+
+    // Add replies
+    foreach ($ticket->replies as $reply) {
+        $events[] = [
+            'date' => 'In Progress',
+            'content' => "Replied by {$reply->user?->name} <small>{$reply->created_at->format('M d, Y h:i A')}</small>"
+        ];
     }
 
     // Add Closed as the end event

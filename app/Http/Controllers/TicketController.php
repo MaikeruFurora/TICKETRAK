@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TicketNotification;
 use App\Models\Ticket;
 use App\Models\TicketAttachment;
 use App\Models\TicketHistory;
 use App\Models\TicketReply;
 use App\Models\User;
+use App\Notifications\TicketUpdateNotification;
 use Illuminate\Support\Facades\DB;
 use App\Services\DataTableService;
 use App\Services\ChunkUploadService;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TicketController extends Controller
 {
@@ -190,7 +193,28 @@ class TicketController extends Controller
                     'old_value' => null,  // probably 'Closed'
                     'new_value' => 'Open',
                 ]);
-                
+
+                DB::afterCommit(function () use ($ticket) {
+                    // Send notification (queued for speed)
+                    // $users = User::where('role', 'ticket_manager')->get();
+                    //         foreach ($users as $user) {
+                    //           $user->notify(new TicketUpdateNotification(
+                    //                 'New Ticket Created',
+                    //                 'A new support ticket (#'. $ticket->code .') has been submitted by '. $ticket->createdBy->name. '. Please review and respond accordingly.',
+                    //                 route('auth.tickets.show', $ticket->id),
+                    //                 'View Ticket'
+                    //             ));
+                    //         }
+                        
+                    $emails = User::where('role','ticket_manager')->pluck('email')->toArray();
+                    Mail::to($emails)->send(new TicketNotification(
+                        'New Ticket',
+                        'A new support ticket (#'. $ticket->code .') has been submitted by '. $ticket->user->name. '. Please review and respond accordingly.',
+                        route('auth.tickets.show', $ticket->id),
+                        'View Ticket'
+                    ));
+                });
+            
             });
             
             return redirect()->route('auth.tickets.create')->with('message', 'Ticket created successfully ');
@@ -251,46 +275,59 @@ class TicketController extends Controller
 
             $oldStatus = $ticket->status; // store old status
 
+            $oldStatus = $ticket->status;
+
             // Toggle ticket status
             $ticket->status = $ticket->status === 'Open' ? 'Closed' : 'Open';
             $ticket->save();
 
             if ($ticket->status === 'Closed') {
-
-               $description = $ticket->user_id === auth()->id()
-                    ? 'You closed your ticket'
+                $description = $ticket->user_id === auth()->id()
+                    ? 'You closed your ticket.'
                     : 'Your support ticket has been successfully resolved and closed. Thank you for reaching out, and feel free to contact us if you need further assistance.';
-
-
-                TicketReply::create([
-                    'ticket_id'   => $ticket->id,
-                    'user_id'     => auth()->id(),
-                    'description' => $description
-                ]);
-
-                TicketHistory::create([
-                    'ticket_id' => $ticket->id,
-                    'user_id'   => auth()->id(),
-                    'type'      => 'status',
-                    'old_value' => $oldStatus,
-                    'new_value' => 'Closed',
-                ]);
-
             } else { // reopened
-                TicketReply::create([
-                    'ticket_id'   => $ticket->id,
-                    'user_id'     => auth()->id(),
-                    'description' => 'Your support ticket has been reopened. Our team will review it and respond as soon as possible.',
-                ]);
-
-                TicketHistory::create([
-                    'ticket_id' => $ticket->id,
-                    'user_id'   => auth()->id(),
-                    'type'      => 'status',
-                    'old_value' => $oldStatus,
-                    'new_value' => 'Reopened',
-                ]);
+                $description = 'Your support ticket has been reopened. Our team will review it and respond as soon as possible.';
             }
+
+            // Create reply
+            TicketReply::create([
+                'ticket_id'   => $ticket->id,
+                'user_id'     => auth()->id(),
+                'description' => $description,
+            ]);
+
+            // Create history
+            TicketHistory::create([
+                'ticket_id' => $ticket->id,
+                'user_id'   => auth()->id(),
+                'type'      => 'status',
+                'old_value' => $oldStatus,
+                'new_value' => $ticket->status,
+            ]);
+
+            $user = User::findorfail($ticket->user_id);
+
+             // Send notifications after the transaction is committed
+            DB::afterCommit(function () use ($user,$description, $ticket) {
+                
+                // Send notification (queued for speed)
+                // $user->notify(new TicketUpdateNotification(
+                //     'Ticket '.$ticket->status,
+                //     $description. ' (#'. $ticket->code .')',
+                //     null,
+                //     null,
+                //     $ticket
+                // ));
+                    
+                Mail::to($user->email)->send(new TicketNotification(
+                    'Ticket '.$ticket->status,
+                    $description. ' (#'. $ticket->code .')',
+                    null,
+                    null,
+                    $ticket
+                ));
+            });
+
         });
 
 

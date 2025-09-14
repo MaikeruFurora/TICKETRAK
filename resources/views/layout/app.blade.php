@@ -19,7 +19,7 @@
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
    <style>
     /* Override Tabler default font */
-    body, .page, .page-body, .container-xl,
+    html, body, .page, .page-body, .container-xl,
     input, select, button, textarea {
       font-family: 'Poppins', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     }

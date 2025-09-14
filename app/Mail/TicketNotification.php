@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -11,34 +10,31 @@ class TicketNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-  use Queueable, SerializesModels;
-
     public $title;
-    public $messageBody;
+    public $msg;
     public $actionUrl;
     public $actionText;
+    public $ticket;
 
-    public function __construct($title='Title', $messageBody='Test', $actionUrl = null, $actionText = null)
+    public function __construct($title, $msg, $actionUrl = null, $actionText = null, $ticket = [])
     {
         $this->title = $title;
-        $this->messageBody = $messageBody;
+        $this->msg = $msg;
         $this->actionUrl = $actionUrl;
         $this->actionText = $actionText;
+        $this->ticket = $ticket;
     }
 
     public function build()
     {
         return $this->subject($this->title)
-                    ->view('emails.base')
-                    ->with([
-                        'title' => $this->title,
-                        'message' => $this->messageBody,
-                        'actionUrl' => $this->actionUrl,
-                        'actionText' => $this->actionText,
-                    ]);
+            ->view('emails.tickets.index') // ✅ custom blade view
+            ->with([
+                'title' => $this->title,
+                'msg' => $this->msg,
+                'actionUrl' => $this->actionUrl,
+                'actionText' => $this->actionText,
+                'ticket' => $this->ticket,
+            ]);
     }
-
 }
-
- 
-

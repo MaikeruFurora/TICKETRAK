@@ -2,52 +2,57 @@
 
 namespace App\Notifications;
 
-use App\Mail\TicketNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\DatabaseMessage;
+use App\Mail\TicketNotification as TicketMail;
 
 class TicketUpdateNotification extends Notification implements ShouldQueue
 {
     use Queueable;
-    
-    protected $ticket;
-    protected $type;
-    protected $messageBody;
 
-    public function __construct($ticket, $type = 'reply', $messageBody = null)
+    public $title;
+    public $msg;
+    public $actionUrl;
+    public $actionText;
+    public $ticket;
+
+    public function __construct($title, $msg, $actionUrl = null, $actionText = null, $ticket = [])
     {
+        $this->title = $title;
+        $this->msg = $msg;
+        $this->actionUrl = $actionUrl;
+        $this->actionText = $actionText;
         $this->ticket = $ticket;
-        $this->type = $type;
-        $this->messageBody = $messageBody;
     }
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database']; // ✅ email + db
     }
-
-    
 
     public function toMail($notifiable)
     {
-        return (new TicketNotification(
-            $this->type === 'assigned' ? 'Ticket Assigned' : 'New Reply',
-            $this->messageBody ?? 'There is an update on your ticket.',
-            route('auth.tickets.show', $this->ticket->id),
-            $this->type === 'assigned' ? 'View Ticket' : 'View Reply'
-        ));
+        // ✅ Use your custom mailable instead of MailMessage
+        return (new TicketMail(
+            $this->title,
+            $this->msg,
+            $this->actionUrl,
+            $this->actionText,
+            $this->ticket
+        ))->to($notifiable->email);
     }
 
-
-    public function toArray($notifiable)
+    public function toDatabase($notifiable)
     {
-        return [
-            'ticket_id' => $this->ticket->id,
-            'title' => $this->type === 'assigned' ? 'Ticket Assigned' : 'New Reply',
-            'message' => $this->messageBody ?? 'You have an update on your ticket.',
-            'type' => $this->type,
-        ];
+        // ✅ Keep database notifications working
+        return new DatabaseMessage([
+            'title' => $this->title,
+            'msg' => $this->msg,
+            'url' => $this->actionUrl,
+            'action_text' => $this->actionText,
+            'ticket' => $this->ticket,
+        ]);
     }
 }

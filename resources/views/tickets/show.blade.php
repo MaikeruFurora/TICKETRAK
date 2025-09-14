@@ -94,7 +94,7 @@
                         </div>
                         <div class="d-none d-md-block">
                               @if (in_array(auth()->user()->role, $role_code))
-                                <a href="{{ route('auth.tickets.history.show', ['ticket' => $ticket->id]) }}" class="text-primary small">
+                                <a href="{{ route('auth.tickets.history.show', ['ticket' => $ticket->id]) }}" class="text-secondary small">
                                     <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-restore"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3.06 13a9 9 0 1 0 .49 -4.087" /><path d="M3 4.001v5h5" /><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg> Logs
                                 </a>
                               @endif
@@ -145,9 +145,14 @@
         <div class="row mb-3">
             <div class="col-sm-2 strong text-muted">Status:</div>
             <div class="col-sm-10 text-muted">
-                 <form id="status-form" data-status="{{ $ticket->status }}" action="{{ route('auth.tickets.status', ['ticket' => $ticket->id]) }}" method="GET">
-                    <button type="submit" id="" class="btn btn-link btn-sm d-flex align-items-center">{{ $ticket->status=='Open' ? 'Close' : 'Reopen' }} Ticket</button>
-                </form>
+                 {{-- <form id="status-form p-0" data-status="{{ $ticket->status }}" action="{{ route('auth.tickets.status', ['ticket' => $ticket->id]) }}" method="GET">
+                    <button type="submit" id="" class="btn-link btn-sm d-flex align-items-center">{{ $ticket->status=='Open' ? 'Close' : 'Reopen' }} Ticket</button>
+                </form> --}}
+                <a data-status="{{ $ticket->status }}" href="{{ route('auth.tickets.status', ['ticket' => $ticket->id]) }}" 
+                class="btn-link btn-sm d-flex align-items-center">
+                {{ $ticket->status=='Open' ? 'Close' : 'Reopen' }} Ticket
+                </a>
+
             </div>
         </div>
 

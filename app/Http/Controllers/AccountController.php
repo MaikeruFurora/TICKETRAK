@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TicketNotification;
 use App\Models\Ticket;
 use App\Models\TicketHistory;
 use App\Models\TicketReply;
@@ -11,6 +12,7 @@ use App\Services\DataTableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class AccountController extends Controller
 {
@@ -235,8 +237,22 @@ class AccountController extends Controller
                 'new_value' => $user->name,
             ]);
 
-            // Send notification (queued for speed)
-            $user->notify(new TicketUpdateNotification($ticket, 'assigned', 'You have been assigned a ticket.'));
+                // Send notification (queued for speed)
+                // $user->notify(new TicketUpdateNotification(
+                //     'Ticket Assigned',
+                //     'A new support ticket (#'.$ticket->code.') has been assigned to you. The ticket manager will reach out to provide the details and guide you through the response.',
+                //     null,
+                //     null,
+                //     $ticket
+                // ));
+                    
+                Mail::to($user->email)->send(new TicketNotification(
+                    'Ticket Assigned',
+                    'A new support ticket (#'.$ticket->code.') has been assigned to you. The ticket manager will reach out to provide the details and guide you through the response.',
+                    null,
+                    null,
+                    $ticket
+                ));
         });
 
         // Return response

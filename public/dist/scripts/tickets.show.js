@@ -207,24 +207,24 @@ $(function(){
             .set({ labels: { ok: "Yes", cancel: "No" }, closableByDimmer: false });
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const collapseEl = document.getElementById("ticketOptions");
-        collapseEl.addEventListener("show.bs.collapse", function () {
-            collapseEl.previousElementSibling
-                .querySelector(".collapse-show")
-                .classList.add("d-none");
-            collapseEl.previousElementSibling
-                .querySelector(".collapse-hide")
-                .classList.remove("d-none");
-        });
-        collapseEl.addEventListener("hide.bs.collapse", function () {
-            collapseEl.previousElementSibling
-                .querySelector(".collapse-show")
-                .classList.remove("d-none");
-            collapseEl.previousElementSibling
-                .querySelector(".collapse-hide")
-                .classList.add("d-none");
-        });
-    });
 
 })
+document.addEventListener("DOMContentLoaded", function () {
+    const collapseEl = document.getElementById("ticketOptions");
+    collapseEl.addEventListener("show.bs.collapse", function () {
+        collapseEl.previousElementSibling
+            .querySelector(".collapse-show")
+            .classList.add("d-none");
+        collapseEl.previousElementSibling
+            .querySelector(".collapse-hide")
+            .classList.remove("d-none");
+    });
+    collapseEl.addEventListener("hide.bs.collapse", function () {
+        collapseEl.previousElementSibling
+            .querySelector(".collapse-show")
+            .classList.remove("d-none");
+        collapseEl.previousElementSibling
+            .querySelector(".collapse-hide")
+            .classList.add("d-none");
+    });
+});
