@@ -237,22 +237,29 @@ class AccountController extends Controller
                 'new_value' => $user->name,
             ]);
 
+             // Send notifications after the transaction is committed
+            DB::afterCommit(function () use ($user, $ticket) {
                 // Send notification (queued for speed)
-                // $user->notify(new TicketUpdateNotification(
+                $user->notify(
+                    (new TicketUpdateNotification(
+                        'Ticket Assigned',
+                        'A new support ticket (#'.$ticket->code.') has been assigned to you. The ticket manager will reach out to provide the details and guide you through the response.',
+                        null,
+                        null,
+                        $ticket
+                    ))->delay(now()->addMinutes(1)) // Delay by 1 minute
+                );
+                    
+                // Mail::to($user->email)->send(new TicketNotification(
                 //     'Ticket Assigned',
                 //     'A new support ticket (#'.$ticket->code.') has been assigned to you. The ticket manager will reach out to provide the details and guide you through the response.',
                 //     null,
                 //     null,
                 //     $ticket
                 // ));
-                    
-                Mail::to($user->email)->send(new TicketNotification(
-                    'Ticket Assigned',
-                    'A new support ticket (#'.$ticket->code.') has been assigned to you. The ticket manager will reach out to provide the details and guide you through the response.',
-                    null,
-                    null,
-                    $ticket
-                ));
+
+            });
+
         });
 
         // Return response

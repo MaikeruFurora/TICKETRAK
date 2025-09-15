@@ -39,11 +39,10 @@ class TicketController extends Controller
         $role_code = array_column(User::ROLES_ONE, 'code');
  
         $ticket = [
-            'open'     => $this->formatNumberShort(auth()->user()->tickets()->where('status', 'Open')->count()),
-            'closed'   => $this->formatNumberShort(auth()->user()->tickets()->where('status', 'Closed')->count()),
-            'total'    => $this->formatNumberShort(auth()->user()->tickets()->count()),
-            'critical' => $this->formatNumberShort(auth()->user()->tickets()
-                                ->where('status', 'Open')
+            'open'     => $this->formatNumberShort(Ticket::where('status', 'Open')->count()),
+            'closed'   => $this->formatNumberShort(Ticket::where('status', 'Closed')->count()),
+            'total'    => $this->formatNumberShort(Ticket::count()),
+            'critical' => $this->formatNumberShort(Ticket::where('status', 'Open')
                                 ->where('created_at', '<', Carbon::now()->subDays(7))
                                 ->count()),
         ]; 
@@ -68,7 +67,9 @@ class TicketController extends Controller
             'created_at',
         ];
 
-        if (auth()->user()->role === 'administrator') {
+        $role_code = array_column(User::ROLES_ONE, 'code');
+
+        if (in_array(auth()->user()->role, $role_code)) {
             $query = Ticket::with(['attachments', 'latestClosedHistory']);
         } else {
             $query = auth()->user()->tickets()->getQuery()->with(['attachments', 'latestClosedHistory']);
@@ -196,23 +197,26 @@ class TicketController extends Controller
 
                 DB::afterCommit(function () use ($ticket) {
                     // Send notification (queued for speed)
-                    // $users = User::where('role', 'ticket_manager')->get();
-                    //         foreach ($users as $user) {
-                    //           $user->notify(new TicketUpdateNotification(
-                    //                 'New Ticket Created',
-                    //                 'A new support ticket (#'. $ticket->code .') has been submitted by '. $ticket->createdBy->name. '. Please review and respond accordingly.',
-                    //                 route('auth.tickets.show', $ticket->id),
-                    //                 'View Ticket'
-                    //             ));
-                    //         }
+                    $users = User::where('role', 'ticket_manager')->get();
+                    foreach ($users as $user) {
+                        $user->notify(
+                            (new TicketUpdateNotification(
+                                'New Ticket',
+                                'A new support ticket (#'. $ticket->code .') has been submitted by '. $ticket->user->name. '. Please review and respond accordingly.',
+                                route('auth.tickets.show', $ticket->id),
+                                'View Ticket',
+                                $ticket
+                            ))->delay(now()->addMinutes(1)) // Delay by 1 minute
+                        );
+                    }
                         
-                    $emails = User::where('role','ticket_manager')->pluck('email')->toArray();
-                    Mail::to($emails)->send(new TicketNotification(
-                        'New Ticket',
-                        'A new support ticket (#'. $ticket->code .') has been submitted by '. $ticket->user->name. '. Please review and respond accordingly.',
-                        route('auth.tickets.show', $ticket->id),
-                        'View Ticket'
-                    ));
+                    // $emails = User::where('role','ticket_manager')->pluck('email')->toArray();
+                    // Mail::to($emails)->send(new TicketNotification(
+                    //     'New Ticket',
+                    //     'A new support ticket (#'. $ticket->code .') has been submitted by '. $ticket->user->name. '. Please review and respond accordingly.',
+                    //     route('auth.tickets.show', $ticket->id),
+                    //     'View Ticket'
+                    // ));
                 });
             
             });
@@ -311,21 +315,23 @@ class TicketController extends Controller
             DB::afterCommit(function () use ($user,$description, $ticket) {
                 
                 // Send notification (queued for speed)
-                // $user->notify(new TicketUpdateNotification(
+                $user->notify(
+                    (new TicketUpdateNotification(
+                        'Ticket '.$ticket->status,
+                        $description. ' (#'. $ticket->code .')',
+                        null,
+                        null,
+                        $ticket
+                    ))->delay(now()->addMinutes(1)) // Delay by 1 minute
+                );
+                    
+                // Mail::to($user->email)->send(new TicketNotification(
                 //     'Ticket '.$ticket->status,
                 //     $description. ' (#'. $ticket->code .')',
                 //     null,
                 //     null,
                 //     $ticket
                 // ));
-                    
-                Mail::to($user->email)->send(new TicketNotification(
-                    'Ticket '.$ticket->status,
-                    $description. ' (#'. $ticket->code .')',
-                    null,
-                    null,
-                    $ticket
-                ));
             });
 
         });

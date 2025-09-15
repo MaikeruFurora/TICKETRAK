@@ -91,24 +91,26 @@ class TicketReplyController extends Controller
                         . nl2br(e($reply->description));
 
                 // Laravel notifications
-                // foreach ($notifiables as $user) {
-                //     $user->notify(new TicketUpdateNotification(
-                //         'Ticket Reply ' . $ticket->code,
-                //         $message, 
-                //         route('auth.tickets.show', $ticket->id),
-                //         'View Ticket',
-                //         $ticket
-                //     ));
-                // }
+                foreach ($notifiables as $user) {
+                    $user->notify(
+                        (new TicketUpdateNotification(
+                            'Ticket Reply ' . $ticket->code,
+                            $message, 
+                            route('auth.tickets.show', $ticket->id),
+                            'View Ticket',
+                            $ticket
+                        ))->delay(now()->addMinutes(1)) // Delay by 1 minute
+                    );
+                }
 
                 // Optional Mailable
-                Mail::to($emails)->queue(new TicketNotification(
-                    'Ticket Reply ' . $ticket->code,
-                    $message,
-                    route('auth.tickets.show', $ticket->id),
-                    'View Ticket',
-                    $ticket
-                ));
+                // Mail::to($emails)->queue(new TicketNotification(
+                //     'Ticket Reply ' . $ticket->code,
+                //     $message,
+                //     route('auth.tickets.show', $ticket->id),
+                //     'View Ticket',
+                //     $ticket
+                // ));
             });
 
 

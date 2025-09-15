@@ -17,7 +17,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background-color:#002E5D; padding:20px; text-align:center;">
-                            <h1 style="margin:0; font-size:22px; color:#F2FAFB;">TicketRak</h1>
+                            <h1 style="margin:0; font-size:22px; color:#F2FAFB;">{{ config('app.name') }}</h1>
                         </td>
                     </tr>
 
@@ -32,7 +32,7 @@
                     <tr>
                         <td style="background-color:#447795; text-align:center; padding:15px;">
                             <p style="margin:0; font-size:12px; color:#F2FAFB;">
-                                &copy; {{ date('Y') }} TicketRak. All rights reserved.
+                                &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
                             </p>
                         </td>
                     </tr>
