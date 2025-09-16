@@ -73,13 +73,11 @@
 
 @section('scripts')
 <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
-
-  <script src="{{ asset('dist/scripts/roadmap/roadmap.js') }}?v={{ time() }}"></script>
-  <script>
-    $(document).ready(function(){
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+<script src="{{ asset('dist/scripts/roadmap/roadmap.js') }}?v={{ time() }}"></script>
+<script>
+$(document).ready(function(){
     let events = {!! json_encode($events) !!}; // Pass from controller as JSON
-
     $('#my-roadmap').roadmap(events, {
         eventsPerSlide: 6,
         slide: 1,
@@ -90,5 +88,5 @@
         }
     });
 });
-  </script>
+</script>
 @endsection

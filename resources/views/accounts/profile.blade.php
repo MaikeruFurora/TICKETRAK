@@ -37,7 +37,7 @@
                     and change your password here.
                 </p>
                 
-                <form action="{{ route('auth.account.profile.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('auth.account.profile.update') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
                     @csrf
                     @method('PUT')
 
@@ -52,6 +52,19 @@
                                required>
                         <small class="form-text text-muted">Displayed on your profile and communications.</small>
                         @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Representative Name</label>
+                        <input type="text" 
+                               name="name" 
+                               class="form-control @error('representative') is-invalid @enderror" 
+                               value="{{ old('representative', auth()->user()->representative) }}" 
+                               required>
+                        <small class="form-text text-muted">Representative</small>
+                        @error('representative')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

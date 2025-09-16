@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+ use Barryvdh\DomPDF\Facade\Pdf;
 
 class TicketController extends Controller
 {
@@ -158,14 +159,25 @@ class TicketController extends Controller
                 'user_id' => 'required|exists:users,id',
                 'subject' => 'required|string|max:255',
                 'description' => 'required|string|max:1000',
-                'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048',
+                'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', // max 2MB per file
+                'attachments' => ['nullable', function ($attribute, $value, $fail) {
+                    if (is_array($value)) {
+                        $totalSize = 0;
+                        foreach ($value as $file) {
+                            $totalSize += $file->getSize(); // size in bytes
+                        }
+                        if ($totalSize > 25 * 1024 * 1024) { // 25MB in bytes
+                            $fail('Total attachments size must not exceed 25MB.');
+                        }
+                    }
+                }],
             ]);
 
             DB::transaction(function () use ($request, $validated) {
                 // Generate ticket code
                 $lastTicket = Ticket::latest('id')->first();
-                $nextId = $lastTicket ? $lastTicket->id + 1 : 1;
-                $ticketCode = 'TCK-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+                $nextId = $lastTicket ? $lastTicket->id + 1 : 0;
+                $ticketCode = str_pad($nextId, 6, '0', STR_PAD_LEFT); // first ticket will be 00000
 
                 $ticket = Ticket::create([
                     'code'        => $ticketCode, // make sure you add column in migration
@@ -275,6 +287,29 @@ class TicketController extends Controller
 
     public function changeStatus(Request $request, Ticket $ticket)
     {
+
+        $user = auth()->user(); // currently logged-in user
+
+        // Check if the user is the creator of the ticket
+        if ($user->id === $ticket->user_id) {
+            // Check if the ticket is currently closed
+            if ($ticket->status === 'Closed') {
+                // Check if closed_at exists and is within 3 days
+                if ($ticket->latestClosedHistory->created_at) {
+                    $closedAt = Carbon::parse($ticket->latestClosedHistory->created_at);
+                    $now = Carbon::now();
+
+                    $diffInDays = $closedAt->diffInDays($now);
+
+                    if ($diffInDays > 3) {
+                        return redirect()
+                        ->route('auth.tickets.show', ['ticket' => $ticket->id])
+                        ->with('message', 'You cannot reopen this ticket because it has been closed for more than 3 days.');
+                    }
+                } 
+            } 
+        }
+
        DB::transaction(function () use ($ticket, $request) {
 
             $oldStatus = $ticket->status; // store old status
@@ -382,5 +417,92 @@ class TicketController extends Controller
 
         return response()->json(['success' => true,'message' => 'Priority successfully changed to '.$validated['priority']]);
     }
+
+
+    public function generateReport(Request $request) {
+         $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'status' => 'required|string',
+        ]);
+        
+        $query = Ticket::query();
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->status && $request->status != 'open') {
+            if ($request->from_date) {
+                $query->whereDate('created_at', '>=', $request->from_date);
+            }
+    
+            if ($request->to_date) {
+                $query->whereDate('created_at', '<=', $request->to_date);
+            }
+        }
+
+        $tickets = $query->with(['user', 'latestClosedHistory.user'])->get();
+
+        $data = $tickets->map(function($ticket) {
+            return [
+                'subject' => $ticket->subject,
+                'ticket_code' => $ticket->code,
+                'description' => $ticket->description,
+                'created_at' => $ticket->created_at->format('m-d-Y'),
+                'created_by' => $ticket->user->name ?? '-',
+                'closed_at' => $ticket->latestClosedHistory?->created_at?->format('m-d-Y') ?? null,
+                'closed_by' => $ticket->latestClosedHistory?->user?->name ?? null,
+                'resolved_days' => $ticket->latestClosedHistory?->created_at->diffInDays($ticket->created_at) ?? null,
+            ];
+        });
+
+        $pdf = Pdf::loadView('reports.generated-ticket', compact('data','validated'));
+        return $pdf->download('ticket_report.pdf');
+    }
+
+    public function report(Request $request) {
+
+        return view('reports.index');
+
+    }
+
+    public function reportList(Request $request) {
+         
+        $query = Ticket::query();
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->status && $request->status != 'open') {
+            if ($request->from_date) {
+                $query->whereDate('created_at', '>=', $request->from_date);
+            }
+    
+            if ($request->to_date) {
+                $query->whereDate('created_at', '<=', $request->to_date);
+            }
+        }
+
+        $tickets = $query->with(['user', 'latestClosedHistory.user'])->get();
+
+        $data = $tickets->map(function($ticket) {
+            return [
+                'subject' => $ticket->subject,
+                'ticket_code' => $ticket->code,
+                'representative' => $ticket->user->representative ?? '-',
+                'created_at' => $ticket->created_at->format('m-d-Y'),
+                'created_by' => $ticket->user->name ?? '-',
+                'closed_at' => $ticket->latestClosedHistory?->created_at?->format('m-d-Y') ?? null,
+                'closed_by' => $ticket->latestClosedHistory?->user?->name ?? null,
+                'resolved_days' => $ticket->latestClosedHistory?->created_at->diffInDays($ticket->created_at) ?? null,
+            ];
+        });
+
+        return response()->json($data);
+       
+    }
+ 
 
 }

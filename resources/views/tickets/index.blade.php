@@ -59,7 +59,7 @@
                         <div class="col-12 col-sm-4 col-md-2">
                             <label class="form-label small text-muted mb-0" style="font-size: 12px">Status</label>
                             <select id="statusFilter" class="form-select form-select-sm">
-                                <option value="">All</option>
+                                {{-- <option value="">All</option> --}}
                                 <option value="Open">Open</option>
                                 <option value="Closed">Closed</option>
                             </select>
@@ -90,7 +90,7 @@
                 <table class="table table-bordered table-responsive table-sm table-hover align-middle w-10" 
                     id="ticketsTable"
                     data-table-url="{{ route('auth.tickets.list') }}">
-                    <thead class="table-light">
+                    <thead class="table-light" style="font-size: 9px">
                         <tr>
                             <th></th>
                             <th class="text-nowrap">Ticket #</th>
@@ -110,29 +110,4 @@
 @endsection
 @section('scripts')
     <script src="{{ asset('dist/scripts/tickets.index.js') }}?v={{ time() }}"></script>
-    <!-- Include CountUp.js UMD -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.6.2/countUp.umd.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Loop through all elements with data-count
-    document.querySelectorAll('[data-count]').forEach(function(el) {
-        const endVal = parseFloat(el.getAttribute('data-count')) || 0;
-
-        // Create CountUp instance
-        const countUp = new window.CountUp(el, endVal, {
-            duration: 2,
-            decimalPlaces: 0
-        });
-
-        // Start animation
-        if (!countUp.error) {
-            countUp.start();
-        } else {
-            console.error(countUp.error);
-        }
-    });
-});
-</script>
-
 @endsection

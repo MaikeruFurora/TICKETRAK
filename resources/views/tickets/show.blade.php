@@ -1,46 +1,5 @@
 @extends('layout.app')
 @section('content')
-<style>
-    .timeline-container {
-  max-height: 500; /* adjust based on how tall ~5 items are */
-  overflow-y: auto;
-  padding-right: 5px; /* space for scrollbar */
-}
-
-.timeline-container::-webkit-scrollbar {
-  width: 6px;
-}
-.timeline-container::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
-}
-
-.timeline {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  position: relative;
-}
-
-/* Make the select look plain but keep text visible */
-/* .plain-select {
-    appearance: none;         
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    border: none;             
-    background: transparent;  
-    font-size: 14px;          
-    color: #000;              
-    padding: 4px 8px;
-    cursor: pointer;
-    outline: none;            
-} */
-
-/* Optional: remove focus outline but add subtle underline */
-/* .plain-select:focus {
-    border-bottom: 1px solid #aaa;
-} */
-</style>
 <div class="page-header">
     <div class="row align-items-center">
         <div class="col">
@@ -80,7 +39,11 @@
         </div>
     </div>
 </div>  
-
+ @if (session('message'))
+    <div class="alert alert-warning mt-2">
+        {{ session('message') }}
+    </div>
+@endif
 <div class="col-sx-12 col-xl-12">
     <div class="card card-md mt-3 bg-gray">
         <div class="card-body "> 
