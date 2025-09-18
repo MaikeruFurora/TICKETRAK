@@ -22,11 +22,11 @@
        <!-- LEFT: Ticket Support Info -->
         <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center text-white info-panel">
         <div class="ps-5" style="max-width: 500px;">
-            <img src="{{  asset('dist/images/logo.svg') }}" height="356" width="356" alt="Logo" class="mb-4">
-            <h1 class="fw-bold" style="font-size: 2.2rem">Support Ticket System</h1>
+            <img src="{{  asset('dist/images/logo.svg') }}" height="370" width="370" alt="Logo" class="mb-4">
+            <h1 class="fw-bold" style="font-size: 2.2rem">{{ config('app.name') }}</h1>
             <p class="mt-3 fs-15">
             Manage and track your issues with ease.  
-            Our team is here to assist you.
+            Our team is here to <br>assist you.
             </p>
             <ul class="list-unstyled mt-4 fs-9">
               <li>✔ Submit tickets in seconds</li>

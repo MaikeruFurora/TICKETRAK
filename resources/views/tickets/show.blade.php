@@ -1,46 +1,66 @@
 @extends('layout.app')
 @section('content')
-<div class="page-header">
-    <div class="row align-items-center">
-        <div class="col">
-            <h2 class="page-title">Ticket #{{ $ticket->code ?? 'N/A' }}</h2>
-            <div class="text-muted my-2">Need help? We're here to assist! Please provide as much detail as possible so we can resolve your issue quickly and efficiently.</div>
-        </div>
-        <div class="col-auto ms-auto">
-        <div class="btn-list">
-            <span class=" d-sm-inline">
-            <a href="{{  route('auth.tickets.index') }}" class="btn"> 
-              <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
-            Back </a>
-            </span>
-              <a href="{{ route('auth.tickets.create') }}" class="btn btn-info d-none d-sm-inline-block" >
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-            height="24" viewBox="0 0 24 24" stroke-width="2"
-            stroke="currentColor" fill="none" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          Submit New Ticket
-        </a>
-        <a href="{{ route('auth.tickets.create') }}" class="btn btn-info d-sm-none btn-icon" 
-          aria-label="Create new report">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                height="24" viewBox="0 0 24 24" stroke-width="2"
-                stroke="currentColor" fill="none" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-        </a> 
-        </div>
-        </div>
+<div class="page-header mt-1">
+  <div class="row align-items-center">
+    <!-- Title + Subtitle -->
+    <div class="col-12 col-md">
+      <h2 class="page-title">Ticket #{{ $ticket->code ?? 'N/A' }}</h2>
+      <div class="text-muted my-2">
+        Need help? We're here to assist! Please provide as much detail as possible 
+        so we can resolve your issue quickly and efficiently.
+      </div>
     </div>
-</div>  
+
+    <!-- Right-side Buttons -->
+    <div class="col-12 col-md-auto d-flex justify-content-end gap-2 mt-3 mt-md-0 flex-wrap flex-md-nowrap">
+      
+      <!-- Back button -->
+      <a href="{{ route('auth.tickets.index') }}" class="btn ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+             class="icon icon-tabler icon-tabler-arrow-left">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M5 12l14 0" />
+          <path d="M5 12l6 6" />
+          <path d="M5 12l6 -6" />
+        </svg>
+        Back
+      </a>
+
+      <!-- Submit New Ticket (desktop text) -->
+      <a href="{{ route('auth.tickets.create') }}" 
+         class="btn btn-info d-none d-sm-inline-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
+             height="24" viewBox="0 0 24 24" stroke-width="2"
+             stroke="currentColor" fill="none" stroke-linecap="round"
+             stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Submit New Ticket
+      </a>
+
+      <!-- Submit New Ticket (mobile icon) -->
+      <a href="{{ route('auth.tickets.create') }}" 
+         class="btn btn-info d-sm-none btn-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
+             height="24" viewBox="0 0 24 24" stroke-width="2"
+             stroke="currentColor" fill="none" stroke-linecap="round"
+             stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </a>
+
+    </div>
+  </div>
+</div>
+
  @if (session('message'))
-    <div class="alert alert-warning mt-2">
+    <div class="alert alert-info mt-2">
         {{ session('message') }}
     </div>
 @endif
@@ -86,7 +106,7 @@
                         @foreach($ticket->attachments as $attachment)
                             @php
                                 $ext = strtolower(pathinfo($attachment->file_name, PATHINFO_EXTENSION));
-                                $url = asset('storage/' . $attachment->file_path);
+                                $url = asset('storage/app/public/' . $attachment->file_path);
                                 $icon = match($ext) {
                                     'jpg','jpeg','png','gif' => $url,
                                     'pdf' => asset('dist/images/file/pdf.png'),
@@ -217,10 +237,10 @@
                 @enderror
             </div>  
             <div class="row mb-5 mt-2">
-                <div class="col-6">  
+                <div class="col-5">  
                     <button {{ $ticket->status=='Closed' ? 'disabled' : '' }} type="submit" id="submitBtn" class="btn btn-info d-flex align-items-center"><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-send"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 14l11 -11" /><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" /></svg>Submit</button>
                 </div>
-               <div class="col-6">
+               <div class="col-7">
                     <div class="d-flex justify-content-end align-items-center">
                         <div id="dropzone" class="border rounded bg-light d-inline-flex align-items-center justify-content-center me-2"
                             style="width: 250px; height: 45px; cursor: pointer;">
@@ -246,9 +266,7 @@
                     </div>
                     <!-- file list preview -->
                     <ul id="fileList" class="mt-2 d-none"></ul>
-                </div>
-
-
+                </div> 
             </div> 
         </form>
         <div class="mb-3">
@@ -270,7 +288,7 @@
                                         @foreach($reply->attachments as $attachment)
                                             @php
                                                 $ext = strtolower(pathinfo($attachment->file_name, PATHINFO_EXTENSION));
-                                                $url = asset('storage/' . $attachment->file_path);
+                                                $url = asset('storage/app/public/' . $attachment->file_path);
                                                 $icon = match($ext) {
                                                     'jpg','jpeg','png','gif' => $url,
                                                     'pdf' => asset('dist/images/file/pdf.png'),

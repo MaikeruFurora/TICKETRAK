@@ -1,7 +1,7 @@
 @extends('layout.app')
 
 @section('content')
-<div class="page-header">
+<div class="page-header mt-1">
     <div class="row align-items-center">
         <div class="col">
             <h2 class="page-title">Update Your Profile</h2>
@@ -30,12 +30,8 @@
 
         <div class="card mb-3">
             <div class="card-body">
-                <h4 class="card-title mb-3">Edit Your Profile</h4>
-                <p class="text-muted  ">
-                    Keep your details current to ensure you don’t miss any important updates or 
-                    account-related notifications. You can also update your profile picture 
-                    and change your password here.
-                </p>
+                <h4 class="card-title ">Edit Your Profile</h4>
+                 
                 
                 <form action="{{ route('auth.account.profile.update') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
                     @csrf

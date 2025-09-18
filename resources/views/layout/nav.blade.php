@@ -46,7 +46,7 @@
                     </a>
                 </li>
 
-                 @if(auth()->user()->role=='ticket_manager' || auth()->user()->role=='administrator')
+                 @if(auth()->user()->role=='administrator')
                   <!-- Reports -->
                  <li class="nav-item">
                       <a class="nav-link px-3 {{ request()->routeIs('auth.report.index') ? 'active fw-bold text-primary' : '' }}"
@@ -67,39 +67,41 @@
                   </li>
                  @endif
 
-                <!-- User Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle px-3" href="#" data-bs-toggle="dropdown">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-user-circle me-1" width="24" height="24"
-                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <circle cx="12" cy="12" r="9" />
-                            <circle cx="12" cy="10" r="3" />
-                            <path d="M6.168 18.849a6 6 0 0 1 11.664 0" />
+                    <a class="nav-link dropdown-toggle px-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-circle me-1"
+                            width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"/>
+                        <circle cx="12" cy="10" r="3"/>
+                        <path d="M6.168 18.849a6 6 0 0 1 11.664 0"/>
                         </svg>
                         {{ auth()->user()->name }}
                     </a>
-                    @if(auth()->user()->role=='administrator')
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('auth.account.user') }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="icon icon-tabler icon-tabler-settings me-1" width="24" height="24"
-                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <circle cx="12" cy="12" r="3" />
-                                        <path
-                                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06 .06a2 2 0 1 1 -2.83 2.83l-.06 -.06a1.65 1.65 0 0 0 -1.82 -.33 1.65 1.65 0 0 0 -1 1.51v.18a2 2 0 1 1 -4 0v-.18a1.65 1.65 0 0 0 -1 -1.51 1.65 1.65 0 0 0 -1.82 .33l-.06 .06a2 2 0 1 1 -2.83 -2.83l.06 -.06a1.65 1.65 0 0 0 .33 -1.82 1.65 1.65 0 0 0 -1.51 -1h-.18a2 2 0 1 1 0 -4h.18a1.65 1.65 0 0 0 1.51 -1 1.65 1.65 0 0 0 -.33 -1.82l-.06 -.06a2 2 0 1 1 2.83 -2.83l.06 .06a1.65 1.65 0 0 0 1.82 .33h.18a1.65 1.65 0 0 0 1 -1.51v-.18a2 2 0 1 1 4 0v.18a1.65 1.65 0 0 0 1 1.51h.18a1.65 1.65 0 0 0 1.82 -.33l.06 -.06a2 2 0 1 1 2.83 2.83l-.06 .06a1.65 1.65 0 0 0 -.33 1.82v.18a1.65 1.65 0 0 0 1.51 1h.18a2 2 0 1 1 0 4h-.18a1.65 1.65 0 0 0 -1.51 1z" />
-                                    </svg>
-                                    Account Settings
-                                </a>
-                            </li>
-                        </ul>
-                    @endif
-                </li>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                        <a class="dropdown-item" href="{{ route('auth.account.user') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                class="icon icon-tabler icon-tabler-settings me-1" 
+                                width="24" height="24" 
+                                viewBox="0 0 24 24" 
+                                stroke-width="2" 
+                                stroke="currentColor" 
+                                fill="none" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.89 3.31 .877 2.42 2.42a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.065 2.572c.89 1.543 -.877 3.31 -2.42 2.42a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.572 -1.065c-1.543 .89 -3.31 -.877 -2.42 -2.42a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.065 -2.572c-.89 -1.543 .877 -3.31 2.42 -2.42a1.724 1.724 0 0 0 2.572 -1.065z" />
+                            <circle cx="12" cy="12" r="3" />
+                            </svg>
+
+                            Account Settings
+                        </a>
+                        </li>
+                    </ul>
+                    </li>
+
 
                 <!-- Notifications Dropdown (Desktop) -->
                 <li class="nav-item dropdown d-none d-lg-block">
@@ -125,32 +127,35 @@
                   </a>
 
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm p-0" style="min-width: 350px;">
-                        <li class="dropdown-header bg-light px-3 py-2 fw-bold">Notifications</li>
-                        @forelse(auth()->user()->unreadNotifications as $notification)
-                            <li>
-                                <a class="dropdown-item d-flex align-items-start px-3 py-2 border-bottom"
-                                    href="{{ $notification->data['url'] ?? '#' }}">
-                                    <div class="flex-grow-1">
-                                        <div class="fw-bold">{{ $notification->data['title'] ?? 'No Title' }}</div>
-                                        <div class="text-truncate text-muted" style="max-width: 250px;">
-                                            {{ $notification->data['msg'] ?? '' }}
+                       <li class="dropdown-header bg-light px-3 py-2 fw-bold">Notifications</li>
+                            @forelse(auth()->user()->notifications->take(6) as $notification)
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-start px-3 py-2 border-bottom
+                                        {{ is_null($notification->read_at) ? 'bg-light fw-bold' : '' }}"
+                                        href="{{ route('auth.notifications.markAsRead', $notification->id) }}">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold">{{ $notification->data['title'] ?? 'No Title' }}</div>
+                                            <div class="text-truncate text-muted" style="max-width: 250px;">
+                                                {{ $notification->data['msg'] ?? '' }}
+                                            </div>
+                                            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                                         </div>
-                                        <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-                                    </div>
+                                    </a>
+                                </li>
+                            @empty
+                                <li class="dropdown-item text-center text-muted py-3">
+                                    No new notifications
+                                </li>
+                            @endforelse
+
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item text-center fw-bold small text-primary py-2"
+                                    href="{{  route('auth.notifications.index')  }}">
+                                    View All
                                 </a>
                             </li>
-                        @empty
-                            <li class="dropdown-item text-center text-muted py-3">
-                                No new notifications
-                            </li>
-                        @endforelse
-                        <li><hr class="dropdown-divider m-0"></li>
-                        <li>
-                            <a class="dropdown-item text-center fw-bold small text-primary py-2"
-                                href="{{  route('auth.notifications.index')  }}">
-                                View All
-                            </a>
-                        </li>
+
                     </ul>
                 </li>
 
@@ -196,8 +201,8 @@
 
                 <ul class="dropdown-menu dropdown-menu-end p-2 shadow" style="min-width: 300px; max-height: 350px; overflow-y: auto;">
                     <li class="dropdown-header px-2 py-1 fw-bold text-uppercase text-muted">Notifications</li>
-
-                    @forelse(auth()->user()->unreadNotifications as $notification)
+ 
+                    @forelse(auth()->user()->unreadNotifications->take(6) as $notification)
                         <li class="mb-2">
                             <a class="dropdown-item p-2 d-flex flex-column border rounded hover-bg-light" href="{{ $notification->data['url'] ?? '#' }}">
                                 <div class="fw-bold">{{ $notification->data['title'] ?? 'No Title' }}</div>

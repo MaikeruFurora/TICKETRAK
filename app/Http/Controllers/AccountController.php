@@ -94,8 +94,8 @@ class AccountController extends Controller
 
         $request->validate([
             'name'      => 'required|string',
-            'username'  => 'required|string',
-            'email'     => 'required|email',            
+            'username'  => 'required|string|unique:users,username,'.$request->id,
+            'email'     => 'required|email|unique:users,email,'.$request->id,            
             'role'      => 'required|string',
             'is_active' => 'required|string',            
         ]);

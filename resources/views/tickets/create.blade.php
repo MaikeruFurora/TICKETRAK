@@ -1,34 +1,38 @@
 @extends('layout.app')
  
 @section('content')
-<div class="page-header">
-    <div class="row align-items-center">
-        <div class="col">
-            <h2 class="page-title">Submit a Support Ticket</h2>
-            <div class="text-muted my-2">
-                Need help? We're here to assist! Please provide as much detail as possible so we can resolve your issue quickly and efficiently.
-            </div>
-        </div>
-        <div class="col-auto ms-auto">
-            <div class="btn-list">
-                <a href="{{ route('auth.tickets.index') }}" class="btn d-sm-inline">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                         class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M5 12h14M5 12l6 6M5 12l6 -6" />
-                    </svg>
-                    Back
-                </a>
-            </div>
-        </div>
+<div class="page-header mt-1">
+  <div class="row align-items-center">
+    <!-- Title + Subtitle -->
+    <div class="col-12 col-md">
+      <h2 class="page-title">Submit a Support Ticket</h2>
+      <div class="text-muted my-2">
+        Need help? We're here to assist! Please provide as much detail as possible 
+        so we can resolve your issue quickly and efficiently.
+      </div>
     </div>
+
+    <!-- Button -->
+    <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex justify-content-end">
+      <a href="{{ route('auth.tickets.index') }}" class="btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+             class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M5 12h14M5 12l6 6M5 12l6 -6" />
+        </svg>
+        Back
+      </a>
+    </div>
+  </div>
 </div>
+
+
 
 <div class="row">
     <!-- LEFT: Ticket Form -->
-    <div class="col-sx-12 col-xl-8">
+    <div class="col-sx-12 col-xl-8 mt-3">
         @if (session('message'))
             <div class="alert alert-info">
                 {{ session('message') }}
@@ -114,7 +118,7 @@
     </div>
 
     <!-- RIGHT: Sidebar -->
-    <div class="col-sx-12 col-xl-4 mt-3">
+    <div class="col-sx-12 col-xl-4 mt-5">
         <!-- What happens next -->
         <div class="card mb-3">
             <div class="card-body">

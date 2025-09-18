@@ -1,39 +1,42 @@
 @extends('layout.app')
  
 @section('content')
-    <div class="page-header">
-    <div class="row align-items-center">
-        <div class="col">
-            <h2 class="page-title">Manage Ticket</h2>
-            <div class="text-muted my-2">Here you can manage and track all your tickets efficiently.</div>
-        </div>
-        <div class="col-auto ms-auto">
-        <div class="btn-list">
-            <span class=" d-sm-inline">
-            <a href="{{  route('auth.tickets.create') }}" class="btn"> 
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Create Ticket </a>
-            </span>
-            
-        </div>
-        </div>
+<div class="page-header mt-1">
+  <div class="row align-items-center">
+    <!-- Title + Subtitle -->
+    <div class="col-12 col-md">
+      <h2 class="page-title">Manage Ticket</h2>
+      <div class="text-muted ">
+        Here you can manage and track all your tickets efficiently.
+      </div>
     </div>
+
+    <!-- Button -->
+    <div class="col-12 col-md-auto mt-1 mt-md-0 d-flex justify-content-end">
+      <a href="{{ route('auth.tickets.create') }}" class="btn d-inline-flex align-items-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Create Ticket
+      </a>
     </div>
+  </div>
+</div>
+
+
     
    {{-- Only show on medium and larger screens --}}
     <div class="d-none d-md-block">
@@ -55,15 +58,7 @@
            <div class="row mb-3">
                 <div class="col-xl-8 col-lg-8 col-12">
                     <div class="row g-3 mb-4 align-items-end">
-                        <!-- Status -->
-                        <div class="col-12 col-sm-4 col-md-2">
-                            <label class="form-label small text-muted mb-0" style="font-size: 12px">Status</label>
-                            <select id="statusFilter" class="form-select form-select-sm">
-                                {{-- <option value="">All</option> --}}
-                                <option value="Open">Open</option>
-                                <option value="Closed">Closed</option>
-                            </select>
-                        </div>
+                      
 
                         <!-- From Date -->
                         <div class="col-6 col-sm-4 col-md-2">
@@ -77,8 +72,18 @@
                             <input type="date" id="toDate" class="form-control form-control-sm" value="{{ $today }}">
                         </div>
 
+                          <!-- Status -->
+                        <div class="col-6 col-sm-4 col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 12px">Status</label>
+                            <select id="statusFilter" class="form-select form-select-sm">
+                                {{-- <option value="">All</option> --}}
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+
                         <!-- Filter Button -->
-                        <div class="col-12 col-sm-4 col-md-2">
+                        <div class="col-6 col-sm-4 col-md-2">
                             <button id="filterBtn" class="btn btn-primary w-100 btn-sm">Filter</button>
                         </div>
                     </div>
@@ -86,24 +91,23 @@
             </div>
  
             {{-- Tickets Table --}}
-            {{-- <div class="table-responsive"> --}}
-                <table class="table table-bordered table-responsive table-sm table-hover align-middle w-10" 
-                    id="ticketsTable"
+            <div class="table-responsive">
+                <table id="ticketsTable" class="table table-vcenter table-nowrap table-sm table-striped table-bordered dt-responsive nowrap" style="width:100%"
                     data-table-url="{{ route('auth.tickets.list') }}">
                     <thead class="table-light" style="font-size: 9px">
                         <tr>
                             <th></th>
-                            <th class="text-nowrap">Ticket #</th>
+                            <th>Ticket #</th>
                             <th>Subject</th> 
                             <th>Created By</th> 
-                            <th class="text-nowrap">Created At</th>
+                            <th>Created At</th>
                             <th>Closed At</th>
                             <th>Closed By</th>
-                            <th class="text-nowrap">Action</th>
+                            <th class="w-1">Action</th>
                         </tr>
                     </thead>
                 </table>
-            {{-- </div> --}}
+            </div>
         </div>
     </div>
 

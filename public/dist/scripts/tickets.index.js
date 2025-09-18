@@ -4,8 +4,21 @@ $(function () {
     let table = $('#ticketsTable').DataTable({ 
         processing: true,
         serverSide: true,
+        paging: true,
+        pageLength: 10,
+        lengthChange: false,
+        autoWidth: false,
         responsive: {
-            details: { type: 'column', target: 'tr' }
+        details: {
+        display: DataTable.Responsive.display.modal({
+            header: function (row) {
+           var data = row.data();
+                return '<span style="font-size: 12px;">Details for ' + data['code'] + '</span>';
+            },
+            modalClass: 'small-font-modal'
+        }),
+        renderer: DataTable.Responsive.renderer.tableAll()
+        }
         },
         columnDefs: [
             { className: 'dtr-control', orderable: false, targets: 0 }

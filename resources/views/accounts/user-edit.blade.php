@@ -2,7 +2,7 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header d-print-none">
+<div class="page-header my-3 d-print-none">
   <div class="container-xl">
     <div class="row g-2 align-items-center">
       <div class="col">
@@ -27,21 +27,14 @@
 </div>
 
 {{-- Main Card --}}
-<div class="page-body">
-  <div class="container-xl">
-      @if (session('message'))
-            <div class="alert alert-danger">
-                {{ session('message') }}
-            </div>
-        @endif
-      <form action="{{ route('auth.account.user.update',['id' => $user->id]) }}" method="POST" autocomplete="off">
-        <div class="card shadow-sm">
-        <div class="card-header">
+<form action="{{ route('auth.account.user.update',['id' => $user->id]) }}" method="POST" autocomplete="off">
+  <div class="card shadow-sm">
+      <div class="card-header">
             <h3 class="card-title">Create New User</h3>
-        </div>
-        <div class="card-body">
+      </div>
+      <div class="card-body">
           @csrf
-          <div class="row g-3">
+        <div class="row g-3">
 
             {{-- Name --}}
             <div class="col-md-6">
@@ -93,15 +86,12 @@
               @error('password') <small class="text-danger">{{ $message }}</small> @enderror
             </div>
 
-          </div>
-        </div>
-        <div class="card-footer py-2 text-end">
-            <button type="submit" class="btn btn-primary">
-                Update User
-            </button>
-        </div>
-    </form>
+      </div>
     </div>
-  </div>
-</div>
+    <div class="card-footer py-2 text-end">
+        <button type="submit" class="btn btn-primary">
+            Update User
+        </button>
+    </div>
+</form>
 @endsection

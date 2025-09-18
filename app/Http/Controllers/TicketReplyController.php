@@ -77,7 +77,7 @@ class TicketReplyController extends Controller
             // Decide who to notify
             if ($reply->user_id === $ticket->user_id) {
                 // User replied → notify assigned agent/manager
-                $notifiables = User::where('role', 'ticket_manager')->get();   // models
+                $notifiables = User::where('role', 'ticket_manager')->where('id',$ticket->assigned_to)->get();   // models
                 $emails = $notifiables->pluck('email')->toArray();             // email array
             } else {
                 // Agent/manager replied → notify ticket owner

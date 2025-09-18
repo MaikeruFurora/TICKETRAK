@@ -2,7 +2,7 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header d-print-none">
+<div class="page-header mt-1 d-print-none">
   <div class="container-xl">
     <div class="row g-2 align-items-center">
       <div class="col">
@@ -30,7 +30,7 @@
 <div class="page-body">
   <div class="container-xl">
       @if (session('message'))
-            <div class="alert alert-danger">
+            <div class="alert alert-info">
                 {{ session('message') }}
             </div>
         @endif

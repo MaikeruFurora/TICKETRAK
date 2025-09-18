@@ -64,6 +64,7 @@ Route::middleware(['auth:web','preventBackHistory'])->prefix('auth')->name('auth
     Route::prefix('notifications')->group(function() {
         Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
         Route::patch('/read/{id}', [NotificationController::class, 'markRead'])->name('notifications.markRead');
+        Route::get('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
         Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
     }); 
    

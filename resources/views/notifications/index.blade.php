@@ -75,6 +75,10 @@
                 </tbody>
             </table>
         </div>
+        <div class="mt-2 d-flex justify-content-center">
+            {{ $notifications->links() }}
+        </div>
+
     </div>
 </div>
 @endsection
